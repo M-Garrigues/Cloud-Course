@@ -40,6 +40,15 @@ jobs:
     needs: [build-app]
     runs-on: ubuntu-18.04
     steps:
+      - uses: actions/checkout@v1
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
       - name: Setup Node
         uses: actions/setup-node@v1
         with:
@@ -52,6 +61,12 @@ jobs:
       - name: Install client tests
         run: npm install
         working-directory: ./client-test
+      - name: Start API
+        run: |
+          ls .
+          ls ./.github/
+          cp ./.github/client-test-config.js ./client-test/baseUrl.js
+          python server.py &
       - name: Run client tests
         if: success()
         run: npm test
