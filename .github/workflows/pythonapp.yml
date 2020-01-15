@@ -49,10 +49,10 @@ jobs:
         with:
           repository: Slashgear/cloud-client-eval
           path: client-test
+      - name: Move in clien tests directory
+        run: cd ./client-test
       - name: Install client tests
-        run: |
-          cd ./client-test
-          npm install
+        run: npm install
       - name: Run client tests
         if: success()
         run: npm test
