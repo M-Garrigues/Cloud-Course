@@ -52,6 +52,10 @@ jobs:
       - name: Install client tests
         run: npm install
         working-directory: ./client-test
+      - name: Start API
+        run: |
+          cp ./.github/client-test-config.js ./client-test/baseUrl.js
+          python server.py &
       - name: Run client tests
         if: success()
         run: npm test
