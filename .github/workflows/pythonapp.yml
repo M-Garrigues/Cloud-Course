@@ -54,6 +54,8 @@ jobs:
         working-directory: ./client-test
       - name: Start API
         run: |
+          ls .
+          ls ./.github/
           cp ./.github/client-test-config.js ./client-test/baseUrl.js
           python server.py &
       - name: Run client tests
