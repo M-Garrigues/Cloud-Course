@@ -12,6 +12,8 @@ cnx = mysql.connector.connect(user='uxmafubcms8efnkd',
 
 app = Flask(__name__)
 
+pers = p.Persistence(cnx)
+
 
 @app.route("/")
 def headers():
@@ -20,9 +22,8 @@ def headers():
 
 @app.route("/user", methods=['GET'])
 def get_users():
-    with open('static/users.json', 'r') as f:
-        d = json.load(f)
-    return jsonify(d)
+    users = pers.get_users()
+    return jsonify(users)
 
 
 @app.route('/user', methods=['PUT'])
@@ -38,9 +39,6 @@ def delete_users():
 
 
 if __name__ == "__main__":
-    p.H = 1
-    print(p.get_user(15))
-
     app.run()
     cnx.close()
 
