@@ -1,6 +1,6 @@
 {
     "build": {
-        "folder": "/"
+        "folder": "."
     },
     "deploy": {
         "module": "hello",
