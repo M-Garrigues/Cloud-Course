@@ -14,7 +14,7 @@ def headers():
 
 @app.route("/user")
 def user():
-    with open('../static/users.json', 'r') as f:
+    with open('static/users.json', 'r') as f:
         d = json.load(f)
     return jsonify(d)
 
