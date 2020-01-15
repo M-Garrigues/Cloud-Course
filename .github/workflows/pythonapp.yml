@@ -27,6 +27,10 @@ jobs:
     needs: [build-app]
     runs-on: ubuntu-18.04
     steps:
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
       - name: Test with pytest
         run: |
           pip install pytest
@@ -46,9 +50,9 @@ jobs:
           repository: Slashgear/cloud-client-eval
           path: client-test
       - name: Install client tests
-        run: |
-          cd ./client-test
-          npm install
+        run: npm install
+        working-directory: ./client-test
       - name: Run client tests
         if: success()
         run: npm test
+        working-directory: ./client-test
