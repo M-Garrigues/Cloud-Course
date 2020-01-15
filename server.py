@@ -1,6 +1,7 @@
 # -*- coding:utf-8 -*-
 import json
 from flask import Flask, Response, request, jsonify
+import persistence as p
 import mysql.connector
 
 cnx = mysql.connector.connect(user='uxmafubcms8efnkd',
@@ -37,6 +38,10 @@ def delete_users():
 
 
 if __name__ == "__main__":
+    p.H = 1
+    print(p.get_user(15))
+
     app.run()
     cnx.close()
+
 
