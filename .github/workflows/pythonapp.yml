@@ -52,7 +52,15 @@ jobs:
       - name: Install client tests
         run: npm install
         working-directory: ./client-test
-      - name: Run client tests
-        if: success()
-        run: npm test
+      - name: Run client tests - Part 1 (CRUD)
+        run: npm run step:1
+        working-directory: ./client-test
+      - name: Run client tests - Part 2 (Pagination)
+        run: npm run step:2
+        working-directory: ./client-test
+      - name: Run client tests - Part 3 (Search)
+        run: npm run step:3
+        working-directory: ./client-test
+      - name: Run client tests - Part 3 Bis (Perf checks)
+        run: npm run step:3bis
         working-directory: ./client-test
