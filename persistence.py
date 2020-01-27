@@ -58,7 +58,7 @@ class Persistence:
         self.delete_users()
         try:
             query = """INSERT INTO Users (id, firstName, lastName, birthDay) 
-                                      VALUES (%s, %s, %s, %s) """
+                                      VALUES (%s, %s, %s, STR_TO_DATE(%s,'%d/%m/%Y')) """
             cursor = self.cnx.cursor()
             cursor.executemany(query, users)
             self.cnx.commit()
@@ -86,9 +86,9 @@ class Persistence:
 
     def post_user(self, user):
         query = """INSERT INTO Users (id, firstName, lastName, birthDay) 
-                                              VALUES (%s, %s, %s, %s) """
+                                              VALUES (%s, %s, %s, STR_TO_DATE(%s,'%d/%m/%Y')) """
         cursor = self.cnx.cursor()
-        user_tuple = (user['id'], user['firstName'], user['lastName'], string_to_mysql(user['birthDay']))
+        user_tuple = (user['id'], user['firstName'], user['lastName'], user['birthDay'])
         cursor.execute(query, user_tuple)
         self.cnx.commit()
         if cursor.rowcount == 1:
@@ -100,7 +100,7 @@ class Persistence:
         try:
             cursor = self.cnx.cursor()
             query = """Update Laptop set Name = %s, Price = %s where id = %s"""
-            user_tuple = (user['id'], user['firstName'], user['lastName'], string_to_mysql(user['birthDay']))
+            user_tuple = (user['id'], user['firstName'], user['lastName'], user['birthDay'])
             cursor.execute(query, user_tuple)
             self.cnx.commit()
             return True
