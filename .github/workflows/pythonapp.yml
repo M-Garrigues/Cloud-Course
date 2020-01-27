@@ -46,28 +46,18 @@ jobs:
         uses: actions/setup-python@v1
         with:
           python-version: 3.7
-      - name: Shutdown Ubuntu MySQL (SUDO)
-        run: sudo service mysql stop # Shutdown the Default MySQL, "sudo" is necessary, please not remove it
-      - name: Start MYSQL Database
-        uses: samin/mysql-action@v1
-        with:
-          character set server: 'utf8' # Optional, default value is 'utf8mb4'. The '--character-set-server' option for mysqld
-          collation server: 'utf8_general_ci' # Optional, default value is 'utf8mb4_general_ci'. The '--collation-server' option for mysqld
-          mysql version: '8.0' # Optional, default value is "latest". The version of the MySQL
-          mysql database: 'python_app' # Optional, default value is "test". The specified database which will be create
-          mysql user: 'developer' # Required if "mysql root password" is empty, default is empty. The superuser for the specified database. Of course you can use secrets, too
-          mysql password: 'my-dev-password' # Required if "mysql user" exists. The password for the "mysql user"
-      - name: Test mysql db
-        run: |
-          docker ps --all
+      - name: Create DB
+      run: mysql -uroot -proot -e "CREATE DATABASE $DB_NAME;"
+      env:
+        DB_NAME: 'python_app'
       - name: Test with pytest
         env:
           ENV: 'test'
           MYSQL_ADDON_HOST: 'localhost'
           MYSQL_ADDON_DB: 'python_app'
           MYSQL_ADDON_PORT: 3306
-          MYSQL_ADDON_USER: 'developer'
-          MYSQL_ADDON_PASSWORD: 'my-dev-password'
+          MYSQL_ADDON_USER: 'root'
+          MYSQL_ADDON_PASSWORD: 'root'
         run: |
           pip install pytest
           pytest
@@ -97,28 +87,18 @@ jobs:
       - name: Install client tests
         run: npm install
         working-directory: ./client-test
-      - name: Shutdown Ubuntu MySQL (SUDO)
-        run: sudo service mysql stop # Shutdown the Default MySQL, "sudo" is necessary, please not remove it
-      - name: Start MYSQL Database
-        uses: samin/mysql-action@v1
-        with:
-          character set server: 'utf8' # Optional, default value is 'utf8mb4'. The '--character-set-server' option for mysqld
-          collation server: 'utf8_general_ci' # Optional, default value is 'utf8mb4_general_ci'. The '--collation-server' option for mysqld
-          mysql version: '8.0' # Optional, default value is "latest". The version of the MySQL
-          mysql database: 'python_app' # Optional, default value is "test". The specified database which will be create
-          mysql user: 'developer' # Default is empty. The superuser for the specified database. Of course you can use secrets, too
-          mysql password: 'my-dev-password' # Required if "mysql user" exists. The password for the "mysql user"
-      - name: Test mysql db
-        run: |
-          docker ps --all
+      - name: Create DB
+        run: mysql -uroot -proot -e "CREATE DATABASE $DB_NAME;"
+        env:
+          DB_NAME: 'python_app'
       - name: Start API
         env:
           ENV: 'test'
           MYSQL_ADDON_HOST: 'localhost'
           MYSQL_ADDON_DB: 'python_app'
           MYSQL_ADDON_PORT: 3306
-          MYSQL_ADDON_USER: 'developer'
-          MYSQL_ADDON_PASSWORD: 'my-dev-password'
+          MYSQL_ADDON_USER: 'root'
+          MYSQL_ADDON_PASSWORD: 'root'
         run: |
           cp ./.github/client-test-config.js ./client-test/baseUrl.js
           python server.py &
