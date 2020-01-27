@@ -47,6 +47,7 @@ jobs:
       - name: Start MYSQL Database
         uses: samin/mysql-action@v1
         with:
+          host port: 3800 # Optional, default value is 3306. The port of host
           character set server: 'utf8' # Optional, default value is 'utf8mb4'. The '--character-set-server' option for mysqld
           collation server: 'utf8_general_ci' # Optional, default value is 'utf8mb4_general_ci'. The '--collation-server' option for mysqld
           mysql version: '8.0' # Optional, default value is "latest". The version of the MySQL
@@ -58,7 +59,7 @@ jobs:
           ENV: 'test'
           MYSQL_ADDON_HOST: 'localhost'
           MYSQL_ADDON_DB: 'python_app'
-          MYSQL_ADDON_PORT: 3306
+          MYSQL_ADDON_PORT: 3800
           MYSQL_ADDON_USER: 'developer'
           MYSQL_ADDON_PASSWORD: 'my-dev-password'
         run: |
@@ -93,6 +94,7 @@ jobs:
       - name: Star MYSQL Database
         uses: samin/mysql-action@v1
         with:
+          host port: 3800 # Optional, default value is 3306. The port of host
           character set server: 'utf8' # Optional, default value is 'utf8mb4'. The '--character-set-server' option for mysqld
           collation server: 'utf8_general_ci' # Optional, default value is 'utf8mb4_general_ci'. The '--collation-server' option for mysqld
           mysql version: '8.0' # Optional, default value is "latest". The version of the MySQL
@@ -104,7 +106,7 @@ jobs:
           ENV: 'test'
           MYSQL_ADDON_HOST: 'localhost'
           MYSQL_ADDON_DB: 'python_app'
-          MYSQL_ADDON_PORT: 3306
+          MYSQL_ADDON_PORT: 3800
           MYSQL_ADDON_USER: 'developer'
           MYSQL_ADDON_PASSWORD: 'my-dev-password'
         run: |
