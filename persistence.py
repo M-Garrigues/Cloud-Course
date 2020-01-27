@@ -39,13 +39,14 @@ class Persistence:
         cursor.execute(query)
         self.cnx.commit()
         cursor.execute(query)
-        records = cursor.fetchall()
-        if len(records) == 0:
-            return True
-        return False
+        # records = cursor.fetchall()
+        # if len(records) == 0:
+        #     return True
+        # return False
+        return True
 
     def put_users(self, users):
-        self.delete_user()
+        self.delete_users()
         try:
             query = """INSERT INTO Users (id, firstName, lastName, birthDay) 
                                       VALUES (%s, %s, %s, %s) """

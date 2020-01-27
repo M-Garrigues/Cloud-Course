@@ -26,7 +26,7 @@ def get_users():
 
 
 @app.route("/user/age", methods=['GET'])
-def get_users():
+def get_users_age():
     gt = request.args.get('gt', default=-1, type=int)
     eq = request.args.get('eq', default=-1, type=int)
     page = request.args.get('page', default=0, type=int)
