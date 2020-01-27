@@ -1,5 +1,6 @@
 import mysql
 from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
 def date_to_string(date):
     return datetime.strftime(date,'%d/%m/%Y')
@@ -34,11 +35,15 @@ class Persistence:
         return self.fetch_users_from_query(query)
 
     def get_users_age_greater(self, age_limit, page):
-        query = "SELECT * FROM Users WHERE ORDER BY ID LIMIT "+self.get_offset(page)+"," + str(self.page_size) + ";"
+
+        date_limit = datetime.now() - relativedelta(years=age_limit)
+        query = "SELECT * FROM Users WHERE birthDay > "+date_limit+" ORDER BY ID LIMIT "+self.get_offset(page)+"," + str(self.page_size) + ";"
         return self.fetch_users_from_query(query)
 
     def get_users_age_equal(self, age, page):
-        query = "SELECT * FROM Users WHERE ORDER BY ID LIMIT "+self.get_offset(page)+"," + str(self.page_size) + ";"
+        min_date = datetime.now() - relativedelta(years=age)
+        max_date = datetime.now() - relativedelta(years=age-1) - relativedelta(days=1)
+        query = "SELECT * FROM Users WHERE ORDER birthDay < "+max_date+" AND birthDay > "+min_date+" ORDER BY ID LIMIT "+self.get_offset(page)+"," + str(self.page_size) + ";"
         return self.fetch_users_from_query(query)
 
     def delete_users(self):
