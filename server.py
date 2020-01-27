@@ -15,7 +15,7 @@ persistence = p.Persistence(cnx)
 # TODO: Remove ?
 @app.route("/")
 def headers():
-    return '<br/>'.join(['%s => %s' % (key, value) for (key, value) in request.headers.items()])
+    return '<h1>BONJOUR</h1>'
 
 
 @app.route("/user", methods=['GET'])
@@ -51,7 +51,10 @@ def get_user(uid):
 
 @app.route('/user', methods=['PUT'])
 def put_users():
-    # TODO: vérifier qu'il a bien un id ? vérifier que c'est bien une list ?
+    if type(request.json) == dict:
+        data = [request.json]
+    else:
+        data = request.json
     user_list = [
         [
             u['id'],
@@ -59,7 +62,7 @@ def put_users():
             u['lastName'],
             u['birthDay']
         ]
-        for u in list(request.json)
+        for u in data
     ]
     if persistence.put_users(user_list):
         return "OK", 201
