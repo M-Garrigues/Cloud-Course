@@ -2,13 +2,9 @@
 import json
 from flask import Flask, make_response, request, jsonify
 import persistence as p
-import mysql.connector
+from db import connexion
 
-cnx = mysql.connector.connect(user='uxmafubcms8efnkd',
-                              password='uKyZrSTyH2NCsjaqxq7U',
-                              host='bwku7xxv8kkyfmuzbjf9-mysql.services.clever-cloud.com',
-                              database='bwku7xxv8kkyfmuzbjf9',
-                              port=3306)
+cnx = connexion
 
 app = Flask(__name__)
 
