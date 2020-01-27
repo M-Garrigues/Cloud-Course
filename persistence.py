@@ -19,7 +19,7 @@ class Persistence:
         return str(page * self.page_size)
 
     def fetch_users_from_query(self, query):
-        cursor = self.cnx.cursor()
+        cursor = self.cnx.cursor(buffered=True)
         cursor.execute(query)
         users = []
         for (id, firstName, lastName, birthday) in cursor:
@@ -47,8 +47,8 @@ class Persistence:
         return self.fetch_users_from_query(query)
 
     def delete_users(self):
-        cursor = self.cnx.cursor()
-        query = "DELETE FROM Users"     # TODO : TRUNCATE MAY BE FASTER
+        cursor = self.cnx.cursor(buffered=True)
+        query = "DELETE FROM Users" # TODO : TRUNCATE MAY BE FASTER
         cursor.execute(query)
         self.cnx.commit()
         cursor.execute(query)
@@ -59,7 +59,7 @@ class Persistence:
         try:
             query = """INSERT INTO Users (id, firstName, lastName, birthDay) 
                                       VALUES (%s, %s, %s, STR_TO_DATE(%s,'%d/%m/%Y')) """
-            cursor = self.cnx.cursor()
+            cursor = self.cnx.cursor(buffered=True)
             cursor.executemany(query, users)
             self.cnx.commit()
             if cursor.rowcount == len(users):
@@ -72,8 +72,8 @@ class Persistence:
             return False
 
     def get_user(self, id):
-        query = "SELECT id, firstName, lastName, DATE_FORMAT(birthDay,'%d/%m/%Y')FROM Users WHERE id = %s"
-        cursor = self.cnx.cursor()
+        query = "SELECT * FROM Users WHERE id = %s"
+        cursor = self.cnx.cursor(buffered=True)
         cursor.execute(query, (id,))
         users = []
         for (id, firstName, lastName, birthday) in cursor:
@@ -87,7 +87,7 @@ class Persistence:
     def post_user(self, user):
         query = """INSERT INTO Users (id, firstName, lastName, birthDay) 
                                               VALUES (%s, %s, %s, STR_TO_DATE(%s,'%d/%m/%Y')) """
-        cursor = self.cnx.cursor()
+        cursor = self.cnx.cursor(buffered=True)
         user_tuple = (user['id'], user['firstName'], user['lastName'], user['birthDay'])
         cursor.execute(query, user_tuple)
         self.cnx.commit()
@@ -98,7 +98,7 @@ class Persistence:
 
     def put_user(self,user):
         try:
-            cursor = self.cnx.cursor()
+            cursor = self.cnx.cursor(buffered=True)
             query = """Update Laptop set Name = %s, Price = %s where id = %s"""
             user_tuple = (user['id'], user['firstName'], user['lastName'], user['birthDay'])
             cursor.execute(query, user_tuple)
@@ -109,12 +109,13 @@ class Persistence:
             return False
 
     def delete_user(self, id):
+        query = "SELECT * FROM Users WHERE id = %s"
+        cursor = self.cnx.cursor(buffered=True)
+        cursor.execute(query, (id,))
+        if cursor.rowcount == 0:
+            return False
         query = "DELETE FROM Users WHERE id = %s"
-        cursor = self.cnx.cursor()
+        cursor = self.cnx.cursor(buffered=True)
         cursor.execute(query, (id,))
         self.cnx.commit()
-        cursor.execute(query)
-        records = cursor.fetchall()
-        if len(records) == 0:
-            return True
-        return False
+        return True
