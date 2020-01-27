@@ -1,2 +1,3 @@
+python-dateutil
 flask==1.1.1
 mysql-connector-python
