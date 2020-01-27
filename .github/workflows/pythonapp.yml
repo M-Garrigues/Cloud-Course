@@ -1,10 +1,23 @@
 name: Python application
 
-on: [push]
+on:
+  # Trigger the workflow on push or pull request,
+  # but only for the master branch
+  push:
+    branches:
+      - dev
+  pull_request:
+    branches:
+      - dev
 
 jobs:
   build-app:
-    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        platform: [ubuntu-latest, windows-latest]
+      fail-fast: false
+
+    runs-on: ${{ matrix.platform }}
     steps:
     - uses: actions/checkout@v1
     - name: Set up Python 3.7
@@ -31,7 +44,25 @@ jobs:
         uses: actions/setup-python@v1
         with:
           python-version: 3.7
+      - name: Shutdown Ubuntu MySQL (SUDO)
+        run: sudo service mysql stop # Shutdown the Default MySQL, "sudo" is necessary, please not remove it
+      - name: Start MYSQL Database
+        uses: samin/mysql-action@v1
+        with:
+          character set server: 'utf8' # Optional, default value is 'utf8mb4'. The '--character-set-server' option for mysqld
+          collation server: 'utf8_general_ci' # Optional, default value is 'utf8mb4_general_ci'. The '--collation-server' option for mysqld
+          mysql version: '8.0' # Optional, default value is "latest". The version of the MySQL
+          mysql database: 'python_app' # Optional, default value is "test". The specified database which will be create
+          mysql user: 'developer' # Required if "mysql root password" is empty, default is empty. The superuser for the specified database. Of course you can use secrets, too
+          mysql password: 'my-dev-password' # Required if "mysql user" exists. The password for the "mysql user"
       - name: Test with pytest
+        env:
+          ENV: 'test'
+          MYSQL_ADDON_HOST: 'localhost'
+          MYSQL_ADDON_DB: 'python_app'
+          MYSQL_ADDON_PORT: 3306
+          MYSQL_ADDON_USER: 'developer'
+          MYSQL_ADDON_PASSWORD: 'my-dev-password'
         run: |
           pip install pytest
           pytest
@@ -61,13 +92,36 @@ jobs:
       - name: Install client tests
         run: npm install
         working-directory: ./client-test
+      - name: Shutdown Ubuntu MySQL (SUDO)
+        run: sudo service mysql stop # Shutdown the Default MySQL, "sudo" is necessary, please not remove it
+      - name: Start MYSQL Database
+        uses: samin/mysql-action@v1
+        with:
+          character set server: 'utf8' # Optional, default value is 'utf8mb4'. The '--character-set-server' option for mysqld
+          collation server: 'utf8_general_ci' # Optional, default value is 'utf8mb4_general_ci'. The '--collation-server' option for mysqld
+          mysql version: '8.0' # Optional, default value is "latest". The version of the MySQL
+          mysql database: 'python_app' # Optional, default value is "test". The specified database which will be create
+          mysql user: 'developer' # Default is empty. The superuser for the specified database. Of course you can use secrets, too
+          mysql password: 'my-dev-password' # Required if "mysql user" exists. The password for the "mysql user"
       - name: Start API
+        env:
+          ENV: 'test'
+          MYSQL_ADDON_HOST: 'localhost'
+          MYSQL_ADDON_DB: 'python_app'
+          MYSQL_ADDON_PORT: 3306
+          MYSQL_ADDON_USER: 'developer'
+          MYSQL_ADDON_PASSWORD: 'my-dev-password'
         run: |
-          ls .
-          ls ./.github/
           cp ./.github/client-test-config.js ./client-test/baseUrl.js
           python server.py &
       - name: Run client tests
         if: success()
         run: npm test
         working-directory: ./client-test
+      - name: pull-request-action
+        if: success()
+        uses: vsoch/pull-request-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH_PREFIX: ""
+          PULL_REQUEST_BRANCH: "master"
