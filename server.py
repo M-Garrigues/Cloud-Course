@@ -22,7 +22,8 @@ def headers():
 
 @app.route("/user", methods=['GET'])
 def get_users():
-    users = pers.get_users()
+    page = request.args.get('page', default=0, type=int)
+    users = pers.get_users(page)
     return jsonify(users)
 
 
@@ -41,5 +42,3 @@ def delete_users():
 if __name__ == "__main__":
     app.run()
     cnx.close()
-
-
