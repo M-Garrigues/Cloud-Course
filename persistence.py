@@ -1,5 +1,13 @@
 import mysql
+from datetime import datetime
+from dateutil.relativedelta import relativedelta
 
+def date_to_string(date):
+    return datetime.strftime(date,'%d/%m/%Y')
+
+def string_to_mysql(string):
+    date = datetime.strptime(string, '%d/%m/%Y')
+    return datetime.strftime(date,'%Y-%m-%d %H:%M:%S')
 
 class Persistence:
 
@@ -7,10 +15,10 @@ class Persistence:
         self.cnx = cnx
         self.page_size = 100
 
-    def get_users(self, page):
+    def get_offset(self, page):
+        return str(page * self.page_size)
 
-        offset = page * self.page_size
-        query = "SELECT * FROM Users ORDER BY ID LIMIT "+ str(offset)+ ","+str(self.page_size)+";"
+    def fetch_users_from_query(self, query):
         cursor = self.cnx.cursor()
         cursor.execute(query)
         users = []
@@ -18,9 +26,25 @@ class Persistence:
             u = {"id": id,
                  "firstName": firstName,
                  "lastName": lastName,
-                 "birthDay": birthday}
+                 "birthDay": date_to_string(birthday)}
             users.append(u)
         return users
+
+    def get_users(self, page):
+        query = "SELECT * FROM Users ORDER BY ID LIMIT "+self.get_offset(page)+","+str(self.page_size)+";"
+        return self.fetch_users_from_query(query)
+
+    def get_users_age_greater(self, age_limit, page):
+
+        date_limit = datetime.now() - relativedelta(years=age_limit)
+        query = "SELECT * FROM Users WHERE birthDay > "+date_limit+" ORDER BY ID LIMIT "+self.get_offset(page)+"," + str(self.page_size) + ";"
+        return self.fetch_users_from_query(query)
+
+    def get_users_age_equal(self, age, page):
+        min_date = datetime.now() - relativedelta(years=age)
+        max_date = datetime.now() - relativedelta(years=age-1) - relativedelta(days=1)
+        query = "SELECT * FROM Users WHERE ORDER birthDay < "+max_date+" AND birthDay > "+min_date+" ORDER BY ID LIMIT "+self.get_offset(page)+"," + str(self.page_size) + ";"
+        return self.fetch_users_from_query(query)
 
     def delete_users(self):
         cursor = self.cnx.cursor()
@@ -28,16 +52,13 @@ class Persistence:
         cursor.execute(query)
         self.cnx.commit()
         cursor.execute(query)
-        records = cursor.fetchall()
-        if len(records) == 0:
-            return True
-        return False
+        return True
 
     def put_users(self, users):
-        self.delete_user()
+        self.delete_users()
         try:
             query = """INSERT INTO Users (id, firstName, lastName, birthDay) 
-                                      VALUES (%s, %s, %s, %s) """
+                                      VALUES (%s, %s, %s, STR_TO_DATE(%s,'%d/%m/%Y')) """
             cursor = self.cnx.cursor()
             cursor.executemany(query, users)
             self.cnx.commit()
@@ -65,7 +86,7 @@ class Persistence:
 
     def post_user(self, user):
         query = """INSERT INTO Users (id, firstName, lastName, birthDay) 
-                                              VALUES (%s, %s, %s, %s) """
+                                              VALUES (%s, %s, %s, STR_TO_DATE(%s,'%d/%m/%Y')) """
         cursor = self.cnx.cursor()
         user_tuple = (user['id'], user['firstName'], user['lastName'], user['birthDay'])
         cursor.execute(query, user_tuple)

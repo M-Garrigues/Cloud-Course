@@ -1,10 +1,25 @@
 name: Python application
 
-on: [push]
+on:
+  # Trigger the workflow on push or pull request,
+  # but only for the master branch
+  push:
+    branches:
+      - dev
+      - dev-ci
+  pull_request:
+    branches:
+      - dev
+      - dev-ci
 
 jobs:
   build-app:
-    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        platform: [ubuntu-latest, windows-latest]
+      fail-fast: false
+
+    runs-on: ${{ matrix.platform }}
     steps:
     - uses: actions/checkout@v1
     - name: Set up Python 3.7
@@ -31,7 +46,18 @@ jobs:
         uses: actions/setup-python@v1
         with:
           python-version: 3.7
+      - name: Create DB
+        run: mysql -uroot -proot -e "CREATE DATABASE $DB_NAME;"
+        env:
+          DB_NAME: 'python_app'
       - name: Test with pytest
+        env:
+          ENV: 'test'
+          MYSQL_ADDON_HOST: 'localhost'
+          MYSQL_ADDON_DB: 'python_app'
+          MYSQL_ADDON_PORT: 3306
+          MYSQL_ADDON_USER: 'root'
+          MYSQL_ADDON_PASSWORD: 'root'
         run: |
           pip install pytest
           pytest
@@ -61,13 +87,29 @@ jobs:
       - name: Install client tests
         run: npm install
         working-directory: ./client-test
+      - name: Create DB
+        run: mysql -uroot -proot -e "CREATE DATABASE $DB_NAME;"
+        env:
+          DB_NAME: 'python_app'
       - name: Start API
+        env:
+          ENV: 'test'
+          MYSQL_ADDON_HOST: 'localhost'
+          MYSQL_ADDON_DB: 'python_app'
+          MYSQL_ADDON_PORT: 3306
+          MYSQL_ADDON_USER: 'root'
+          MYSQL_ADDON_PASSWORD: 'root'
         run: |
-          ls .
-          ls ./.github/
           cp ./.github/client-test-config.js ./client-test/baseUrl.js
           python server.py &
       - name: Run client tests
         if: success()
         run: npm test
         working-directory: ./client-test
+      - name: pull-request-action
+        if: success()
+        uses: vsoch/pull-request-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH_PREFIX: ""
+          PULL_REQUEST_BRANCH: "master"
