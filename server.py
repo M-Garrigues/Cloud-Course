@@ -15,6 +15,11 @@ persistence = p.Persistence(cnx)
 # TODO: Remove ?
 @app.route("/")
 def headers():
+    date = p.string_to_date("01/02/2023")
+    stri = p.date_to_string(date)
+
+    print(date)
+    print(stri)
     return '<br/>'.join(['%s => %s' % (key, value) for (key, value) in request.headers.items()])
 
 

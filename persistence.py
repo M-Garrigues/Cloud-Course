@@ -1,4 +1,12 @@
 import mysql
+from datetime import datetime
+
+def date_to_string(date):
+    return datetime.strftime(date,'%d/%m/%Y')
+
+def string_to_mysql(string):
+    date = datetime.strptime(string, '%d/%m/%Y')
+    return datetime.strftime(date,'%Y-%m-%d %H:%M:%S')
 
 class Persistence:
 
@@ -17,7 +25,7 @@ class Persistence:
             u = {"id": id,
                  "firstName": firstName,
                  "lastName": lastName,
-                 "birthDay": birthday}
+                 "birthDay": date_to_string(birthday)}
             users.append(u)
         return users
 
@@ -39,10 +47,6 @@ class Persistence:
         cursor.execute(query)
         self.cnx.commit()
         cursor.execute(query)
-        # records = cursor.fetchall()
-        # if len(records) == 0:
-        #     return True
-        # return False
         return True
 
     def put_users(self, users):
@@ -79,7 +83,7 @@ class Persistence:
         query = """INSERT INTO Users (id, firstName, lastName, birthDay) 
                                               VALUES (%s, %s, %s, %s) """
         cursor = self.cnx.cursor()
-        user_tuple = (user['id'], user['firstName'], user['lastName'], user['birthDay'])
+        user_tuple = (user['id'], user['firstName'], user['lastName'], string_to_mysql(user['birthDay']))
         cursor.execute(query, user_tuple)
         self.cnx.commit()
         if cursor.rowcount == 1:
@@ -91,7 +95,7 @@ class Persistence:
         try:
             cursor = self.cnx.cursor()
             query = """Update Laptop set Name = %s, Price = %s where id = %s"""
-            user_tuple = (user['id'], user['firstName'], user['lastName'], user['birthDay'])
+            user_tuple = (user['id'], user['firstName'], user['lastName'], string_to_mysql(user['birthDay']))
             cursor.execute(query, user_tuple)
             self.cnx.commit()
             return True
