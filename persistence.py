@@ -26,29 +26,29 @@ class Persistence:
             u = {"id": id,
                  "firstName": firstName,
                  "lastName": lastName,
-                 "birthDay": date_to_string(birthday)}
+                 "birthDay": birthday}
             users.append(u)
         return users
 
     def get_users(self, page):
-        query = "SELECT * FROM Users ORDER BY ID LIMIT "+self.get_offset(page)+","+str(self.page_size)+";"
+        query = "SELECT id, firstName, lastName, DATE_FORMAT(birthDay,'%d/%m/%Y')FROM Users ORDER BY ID LIMIT "+self.get_offset(page)+","+str(self.page_size)+";"
         return self.fetch_users_from_query(query)
 
     def get_users_age_greater(self, age_limit, page):
 
         date_limit = datetime.now() - relativedelta(years=age_limit)
-        query = "SELECT * FROM Users WHERE birthDay > "+date_limit+" ORDER BY ID LIMIT "+self.get_offset(page)+"," + str(self.page_size) + ";"
+        query = "SELECT id, firstName, lastName, DATE_FORMAT(birthDay,'%d/%m/%Y')FROM Users WHERE birthDay > "+date_limit+" ORDER BY ID LIMIT "+self.get_offset(page)+"," + str(self.page_size) + ";"
         return self.fetch_users_from_query(query)
 
     def get_users_age_equal(self, age, page):
         min_date = datetime.now() - relativedelta(years=age)
         max_date = datetime.now() - relativedelta(years=age-1) - relativedelta(days=1)
-        query = "SELECT * FROM Users WHERE ORDER birthDay < "+max_date+" AND birthDay > "+min_date+" ORDER BY ID LIMIT "+self.get_offset(page)+"," + str(self.page_size) + ";"
+        query = "SELECT id, firstName, lastName, DATE_FORMAT(birthDay,'%d/%m/%Y')FROM Users WHERE ORDER birthDay < "+max_date+" AND birthDay > "+min_date+" ORDER BY ID LIMIT "+self.get_offset(page)+"," + str(self.page_size) + ";"
         return self.fetch_users_from_query(query)
 
     def delete_users(self):
         cursor = self.cnx.cursor()
-        query = "DELETE FROM Users" # TODO : TRUNCATE MAY BE FASTER
+        query = "DELETE FROM Users"     # TODO : TRUNCATE MAY BE FASTER
         cursor.execute(query)
         self.cnx.commit()
         cursor.execute(query)
@@ -72,7 +72,7 @@ class Persistence:
             return False
 
     def get_user(self, id):
-        query = "SELECT * FROM Users WHERE id = %s"
+        query = "SELECT id, firstName, lastName, DATE_FORMAT(birthDay,'%d/%m/%Y')FROM Users WHERE id = %s"
         cursor = self.cnx.cursor()
         cursor.execute(query, (id,))
         users = []
