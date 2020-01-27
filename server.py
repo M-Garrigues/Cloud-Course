@@ -5,6 +5,7 @@ import persistence as p
 from db import connexion
 
 cnx = connexion
+print(connexion)
 
 app = Flask(__name__)
 
@@ -39,7 +40,6 @@ def get_users():
         users = persistence.get_users_age_equal(eq, page)
     else:
         users = persistence.get_users(page)
-
     return jsonify(users)
 
 
@@ -62,9 +62,9 @@ def put_users():
         for u in list(request.json)
     ]
     if persistence.put_users(user_list):
-        return make_response("OK", 201)
+        return "OK", 201
     else:
-        return make_response("BAD", 500)
+        return "BAD", 500
 
 
 @app.route('/user/<uid>', methods=['PUT'])
@@ -75,29 +75,29 @@ def put_user(uid):
     except KeyError:
         user['id'] = uid
     if persistence.put_user(user):
-        return make_response("OK", 201)
+        return "OK", 201
     else:
-        return make_response("BAD", 500)
+        return "BAD", 500
 
 
 @app.route('/user', methods=['DELETE'])
 def delete_users():
     persistence.delete_users()
-    return make_response("OK", 200)
+    return "OK", 200
 
 
 @app.route('/user/<uid>', methods=['DELETE'])
-def delete_users(uid):
+def delete_user(uid):
     if persistence.delete_user(uid):
-        return make_response("OK", 200)
+        return "OK", 200
     else:
-        return make_response("BAD", 500)
+        return "BAD", 500
 
 
 @app.route("/user", methods=['POST'])
 def post_user():
     persistence.post_user(request.json)
-    return make_response("OK", 200)
+    return "OK", 200
 
 
 if __name__ == "__main__":
