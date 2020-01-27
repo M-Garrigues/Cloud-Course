@@ -47,9 +47,9 @@ jobs:
         with:
           python-version: 3.7
       - name: Create DB
-      run: mysql -uroot -proot -e "CREATE DATABASE $DB_NAME;"
-      env:
-        DB_NAME: 'python_app'
+        run: mysql -uroot -proot -e "CREATE DATABASE $DB_NAME;"
+        env:
+          DB_NAME: 'python_app'
       - name: Test with pytest
         env:
           ENV: 'test'
