@@ -2,13 +2,9 @@
 import json
 from flask import Flask, Response, request, jsonify
 import persistence as p
-import mysql.connector
+from db import connexion
 
-cnx = mysql.connector.connect(user='uxmafubcms8efnkd',
-                              password='uKyZrSTyH2NCsjaqxq7U',
-                              host='bwku7xxv8kkyfmuzbjf9-mysql.services.clever-cloud.com',
-                              database='bwku7xxv8kkyfmuzbjf9',
-                              port=3306)
+cnx = connexion
 
 app = Flask(__name__)
 
@@ -22,7 +18,8 @@ def headers():
 
 @app.route("/user", methods=['GET'])
 def get_users():
-    users = pers.get_users()
+    page = request.args.get('page', default=0, type=int)
+    users = pers.get_users(page)
     return jsonify(users)
 
 
@@ -41,5 +38,3 @@ def delete_users():
 if __name__ == "__main__":
     app.run()
     cnx.close()
-
-
