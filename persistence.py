@@ -1,9 +1,5 @@
 import mysql
 
-
-
-
-
 class Persistence:
 
     def __init__(self, cnx):
@@ -26,17 +22,14 @@ class Persistence:
         return users
 
     def get_users(self, page):
-
         query = "SELECT * FROM Users ORDER BY ID LIMIT "+self.get_offset(page)+","+str(self.page_size)+";"
         return self.fetch_users_from_query(query)
 
     def get_users_age_greater(self, age_limit, page):
-
         query = "SELECT * FROM Users WHERE ORDER BY ID LIMIT "+self.get_offset(page)+"," + str(self.page_size) + ";"
         return self.fetch_users_from_query(query)
-    
-    def get_users_age_equal(self, age, page):
 
+    def get_users_age_equal(self, age, page):
         query = "SELECT * FROM Users WHERE ORDER BY ID LIMIT "+self.get_offset(page)+"," + str(self.page_size) + ";"
         return self.fetch_users_from_query(query)
 
