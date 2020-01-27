@@ -44,7 +44,7 @@ jobs:
         uses: actions/setup-python@v1
         with:
           python-version: 3.7
-      - name:
+      - name: Start MYSQL Database
         uses: samin/mysql-action@v1
         with:
           character set server: 'utf8' # Optional, default value is 'utf8mb4'. The '--character-set-server' option for mysqld
@@ -54,16 +54,16 @@ jobs:
           mysql user: 'developer' # Required if "mysql root password" is empty, default is empty. The superuser for the specified database. Of course you can use secrets, too
           mysql password: 'my-dev-password' # Required if "mysql user" exists. The password for the "mysql user"
       - name: Test with pytest
-        run: |
-          pip install pytest
-          pytest
-        with:
+        env:
           ENV: 'test'
           MYSQL_ADDON_HOST: 'localhost'
           MYSQL_ADDON_DB: 'python_app'
           MYSQL_ADDON_PORT: 3306
           MYSQL_ADDON_USER: 'developer'
           MYSQL_ADDON_PASSWORD: 'my-dev-password'
+        run: |
+          pip install pytest
+          pytest
 
   client-test:
     needs: [build-app]
@@ -90,26 +90,26 @@ jobs:
       - name: Install client tests
         run: npm install
         working-directory: ./client-test
-      - name:
-          uses: samin/mysql-action@v1
-          with:
-            character set server: 'utf8' # Optional, default value is 'utf8mb4'. The '--character-set-server' option for mysqld
-              collation server: 'utf8_general_ci' # Optional, default value is 'utf8mb4_general_ci'. The '--collation-server' option for mysqld
-              mysql version: '8.0' # Optional, default value is "latest". The version of the MySQL
-              mysql database: 'python_app' # Optional, default value is "test". The specified database which will be create
-              mysql user: 'developer' # Default is empty. The superuser for the specified database. Of course you can use secrets, too
-              mysql password: 'my-dev-password' # Required if "mysql user" exists. The password for the "mysql user"
-      - name: Start API
-        run: |
-          cp ./.github/client-test-config.js ./client-test/baseUrl.js
-          python server.py &
+      - name: Star MYSQL Database
+        uses: samin/mysql-action@v1
         with:
+          character set server: 'utf8' # Optional, default value is 'utf8mb4'. The '--character-set-server' option for mysqld
+          collation server: 'utf8_general_ci' # Optional, default value is 'utf8mb4_general_ci'. The '--collation-server' option for mysqld
+          mysql version: '8.0' # Optional, default value is "latest". The version of the MySQL
+          mysql database: 'python_app' # Optional, default value is "test". The specified database which will be create
+          mysql user: 'developer' # Default is empty. The superuser for the specified database. Of course you can use secrets, too
+          mysql password: 'my-dev-password' # Required if "mysql user" exists. The password for the "mysql user"
+      - name: Start API
+        env:
           ENV: 'test'
           MYSQL_ADDON_HOST: 'localhost'
           MYSQL_ADDON_DB: 'python_app'
           MYSQL_ADDON_PORT: 3306
           MYSQL_ADDON_USER: 'developer'
           MYSQL_ADDON_PASSWORD: 'my-dev-password'
+        run: |
+          cp ./.github/client-test-config.js ./client-test/baseUrl.js
+          python server.py &
       - name: Run client tests
         if: success()
         run: npm test
