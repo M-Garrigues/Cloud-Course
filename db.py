@@ -1,14 +1,15 @@
 import mysql.connector
 import os
 
-if os.environ['ENV'] == 'test' or os.environ['ENV'] == 'prod':
+try:
+    assert os.environ['ENV'] == 'test' or os.environ['ENV'] == 'prod'
     # Config test and prod (they use similar ENV variables)
     user = os.environ['MYSQL_ADDON_USER']
     password = os.environ['MYSQL_ADDON_PASSWORD']
     host = os.environ['MYSQL_ADDON_HOST']
     database = os.environ['MYSQL_ADDON_DB']
     port = os.environ['MYSQL_ADDON_PORT']
-else:
+except (KeyError, AssertionError):
     # Config dev
     user = 'uxmafubcms8efnkd'
     password = 'uKyZrSTyH2NCsjaqxq7U'
