@@ -20,7 +20,26 @@ def headers():
 @app.route("/user", methods=['GET'])
 def get_users():
     page = request.args.get('page', default=0, type=int)
-    users = persistence.get_users()
+    users = persistence.get_users(page)
+    return jsonify(users)
+
+
+@app.route("/user/age", methods=['GET'])
+def get_users():
+    gt = request.args.get('gt', default=-1, type=int)
+    eq = request.args.get('eq', default=-1, type=int)
+    page = request.args.get('page', default=0, type=int)
+
+    if not isinstance(gt, int) and not isinstance(eq, int):
+        return []
+
+    if gt > 0:
+        users = persistence.get_users_age_greater(gt, page)
+    elif eq > 0:
+        users = persistence.get_users_age_equal(eq, page)
+    else:
+        users = persistence.get_users(page)
+
     return jsonify(users)
 
 

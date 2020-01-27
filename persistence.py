@@ -1,16 +1,19 @@
 import mysql
 
 
+
+
+
 class Persistence:
 
     def __init__(self, cnx):
         self.cnx = cnx
         self.page_size = 100
 
-    def get_users(self, page):
+    def get_offset(self, page):
+        return str(page * self.page_size)
 
-        offset = page * self.page_size
-        query = "SELECT * FROM Users ORDER BY ID LIMIT "+ str(offset)+ ","+str(self.page_size)+";"
+    def fetch_users_from_query(self, query):
         cursor = self.cnx.cursor()
         cursor.execute(query)
         users = []
@@ -21,6 +24,21 @@ class Persistence:
                  "birthDay": birthday}
             users.append(u)
         return users
+
+    def get_users(self, page):
+
+        query = "SELECT * FROM Users ORDER BY ID LIMIT "+self.get_offset(page)+","+str(self.page_size)+";"
+        return self.fetch_users_from_query(query)
+
+    def get_users_age_greater(self, age_limit, page):
+
+        query = "SELECT * FROM Users WHERE ORDER BY ID LIMIT "+self.get_offset(page)+"," + str(self.page_size) + ";"
+        return self.fetch_users_from_query(query)
+    
+    def get_users_age_equal(self, age, page):
+
+        query = "SELECT * FROM Users WHERE ORDER BY ID LIMIT "+self.get_offset(page)+"," + str(self.page_size) + ";"
+        return self.fetch_users_from_query(query)
 
     def delete_users(self):
         cursor = self.cnx.cursor()
