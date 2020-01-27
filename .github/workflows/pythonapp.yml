@@ -44,11 +44,11 @@ jobs:
         uses: actions/setup-python@v1
         with:
           python-version: 3.7
+      - name: Shutdown Ubuntu MySQL (SUDO)
+        run: sudo service mysql stop # Shutdown the Default MySQL, "sudo" is necessary, please not remove it
       - name: Start MYSQL Database
         uses: samin/mysql-action@v1
         with:
-          host port: 3800 # Optional, default value is 3306. The port of host
-          container port: 3307 # Optional, default value is 3306. The port of container
           character set server: 'utf8' # Optional, default value is 'utf8mb4'. The '--character-set-server' option for mysqld
           collation server: 'utf8_general_ci' # Optional, default value is 'utf8mb4_general_ci'. The '--collation-server' option for mysqld
           mysql version: '8.0' # Optional, default value is "latest". The version of the MySQL
@@ -60,7 +60,7 @@ jobs:
           ENV: 'test'
           MYSQL_ADDON_HOST: 'localhost'
           MYSQL_ADDON_DB: 'python_app'
-          MYSQL_ADDON_PORT: 3307
+          MYSQL_ADDON_PORT: 3306
           MYSQL_ADDON_USER: 'developer'
           MYSQL_ADDON_PASSWORD: 'my-dev-password'
         run: |
@@ -92,11 +92,11 @@ jobs:
       - name: Install client tests
         run: npm install
         working-directory: ./client-test
-      - name: Star MYSQL Database
+      - name: Shutdown Ubuntu MySQL (SUDO)
+        run: sudo service mysql stop # Shutdown the Default MySQL, "sudo" is necessary, please not remove it
+      - name: Start MYSQL Database
         uses: samin/mysql-action@v1
         with:
-          host port: 3800 # Optional, default value is 3306. The port of host
-          container port: 3307 # Optional, default value is 3306. The port of container
           character set server: 'utf8' # Optional, default value is 'utf8mb4'. The '--character-set-server' option for mysqld
           collation server: 'utf8_general_ci' # Optional, default value is 'utf8mb4_general_ci'. The '--collation-server' option for mysqld
           mysql version: '8.0' # Optional, default value is "latest". The version of the MySQL
@@ -108,7 +108,7 @@ jobs:
           ENV: 'test'
           MYSQL_ADDON_HOST: 'localhost'
           MYSQL_ADDON_DB: 'python_app'
-          MYSQL_ADDON_PORT: 3307
+          MYSQL_ADDON_PORT: 3306
           MYSQL_ADDON_USER: 'developer'
           MYSQL_ADDON_PASSWORD: 'my-dev-password'
         run: |
