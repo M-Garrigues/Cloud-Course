@@ -105,9 +105,10 @@ jobs:
           python server.py > logs/api.log &
       - name: Run client tests
         if: success()
-        run: |
-          npm test
-          cat logs/api.log
+        run: npm test
+      - name: Show logs
+        if: always()
+        run: cat logs/api.log
         working-directory: ./client-test
       - name: pull-request-action
         if: success()
