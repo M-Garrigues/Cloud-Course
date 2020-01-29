@@ -101,11 +101,21 @@ jobs:
           MYSQL_ADDON_PASSWORD: 'root'
         run: |
           cp ./.github/client-test-config.js ./client-test/baseUrl.js
-          python server.py &
+          mkdir logs
+          ls -la
+          echo "" > logs/api.log
+          ls -la ./logs
+          python server.py > logs/api.log &
       - name: Run client tests
         if: success()
         run: npm test
         working-directory: ./client-test
+      - name: Show logs
+        if: always()
+        run: |
+          ls -la
+          ls -la ./logs
+          cat logs/api.log
       - name: pull-request-action
         if: success()
         uses: vsoch/pull-request-action@master
