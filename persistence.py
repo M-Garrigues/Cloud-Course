@@ -63,6 +63,11 @@ class Persistence:
     def put_users(self, users):
         self.delete_users()
         try:
+            _ = users[0]['id']
+        except KeyError:
+            for i in range(len(users)):
+                users[i]['id'] = str(i)
+        try:
             query = """INSERT INTO Users (id, firstName, lastName, birthDay) 
                                       VALUES (%s, %s, %s, STR_TO_DATE(%s,'%d/%m/%Y')) """
             cursor = self.cnx.cursor(buffered=True)
