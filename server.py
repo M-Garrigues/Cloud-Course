@@ -87,12 +87,14 @@ def put_users():
             u['id'],
             u['firstName'],
             u['lastName'],
-            u['birthDay']
+            u['birthDay'],
+            u['position']['lat'],
+            u['position']['lon']
         ]
         for u in data
     ]
-    if persistence.put_users(user_list):
-        return user_list, 201
+    if persistence.put_users(data):
+        return jsonify(data), 201
     else:
         return "BAD", 500
 
