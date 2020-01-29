@@ -110,7 +110,7 @@ class Persistence:
                                               VALUES (%s, %s, %s, STR_TO_DATE(%s,'%d/%m/%Y'), %s, %s) """
         cursor = self.cnx.cursor(buffered=True)
         new_id = self.create_id()
-        user_tuple = (new_id, user['firstName'], user['lastName'], user['birthDay'])
+        user_tuple = (new_id, user['firstName'], user['lastName'], user['birthDay'], user['position']['lat'], user['position']['lon'])
         cursor.execute(query, user_tuple)
         self.cnx.commit()
         if cursor.rowcount == 1:
