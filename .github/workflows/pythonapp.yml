@@ -101,10 +101,13 @@ jobs:
           MYSQL_ADDON_PASSWORD: 'root'
         run: |
           cp ./.github/client-test-config.js ./client-test/baseUrl.js
-          python server.py &
+          mkdir logs
+          python server.py > logs/api.log &
       - name: Run client tests
         if: success()
-        run: npm test
+        run: |
+          npm test
+          cat logs/api.log
         working-directory: ./client-test
       - name: pull-request-action
         if: success()
