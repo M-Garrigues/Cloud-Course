@@ -138,7 +138,7 @@ def post_user():
     new_id  = persistence.post_user(user)
     if new_id:
         user['id'] = new_id
-        return jsonify(user)
+        return jsonify(user), 201
     else:
         return "Server error", 500
 
