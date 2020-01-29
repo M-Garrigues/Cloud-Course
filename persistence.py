@@ -97,11 +97,12 @@ class Persistence:
         cursor = self.cnx.cursor(buffered=True)
         cursor.execute(query, (id,))
         users = []
-        for (id, firstName, lastName, birthday) in cursor:
+        for (id, firstName, lastName, birthday, lat, lon) in cursor:
             u = {"id": id,
                  "firstName": firstName,
                  "lastName": lastName,
-                 "birthDay": birthday}
+                 "birthDay": birthday,
+                 "position": {"lat": float(lat), "lon": float(lon)}}
             users.append(u)
         return users
 
