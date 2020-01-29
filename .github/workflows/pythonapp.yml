@@ -109,13 +109,13 @@ jobs:
       - name: Run client tests
         if: success()
         run: npm test
+        working-directory: ./client-test
       - name: Show logs
         if: always()
         run: |
           ls -la
           ls -la ./logs
           cat logs/api.log
-        working-directory: ./client-test
       - name: pull-request-action
         if: success()
         uses: vsoch/pull-request-action@master
