@@ -28,35 +28,36 @@ class Persistence:
         cursor = self.cnx.cursor(buffered=True)
         cursor.execute(query)
         users = []
-        for (id, firstName, lastName, birthday) in cursor:
+        for (id, firstName, lastName, birthday, lat, lon) in cursor:
             u = {"id": id,
                  "firstName": firstName,
                  "lastName": lastName,
-                 "birthDay": birthday}
+                 "birthDay": birthday,
+                 "position": {"lat": lat, "lon": lon}}
             users.append(u)
         return users
 
     def get_users(self, page):
-        query = "SELECT id, firstName, lastName, DATE_FORMAT(birthDay,'%d/%m/%Y')FROM Users ORDER BY ID LIMIT "+self.get_offset(page)+","+str(self.page_size)+";"
+        query = "SELECT id, firstName, lastName, DATE_FORMAT(birthDay,'%d/%m/%Y'), lat, lon FROM Users ORDER BY ID LIMIT "+self.get_offset(page)+","+str(self.page_size)+";"
         return self.fetch_users_from_query(query)
 
     def get_users_age_greater(self, age_limit, page):
         date_limit = datetime.now() - relativedelta(years=age_limit)
 
-        query = "SELECT id, firstName, lastName, DATE_FORMAT(birthDay,'%d/%m/%Y')FROM Users WHERE date(birthDay) < date '"+date_to_mysql_string(date_limit)+"' ORDER BY ID LIMIT "+self.get_offset(page)+"," + str(self.page_size) + ";"
+        query = "SELECT id, firstName, lastName, DATE_FORMAT(birthDay,'%d/%m/%Y'), lat, lon FROM Users WHERE date(birthDay) < date '"+date_to_mysql_string(date_limit)+"' ORDER BY ID LIMIT "+self.get_offset(page)+"," + str(self.page_size) + ";"
         print(query)
         return self.fetch_users_from_query(query)
 
     def get_users_age_equal(self, age, page):
         min_date = datetime.now() - relativedelta(years=age+1)
         max_date = datetime.now() - relativedelta(years=age) - relativedelta(days=1)
-        query = "SELECT id, firstName, lastName, DATE_FORMAT(birthDay,'%d/%m/%Y')FROM Users WHERE  date(birthDay) < '"+date_to_mysql_string(max_date)+"' AND birthDay > '"+date_to_mysql_string(min_date)+"' ORDER BY ID LIMIT "+self.get_offset(page)+"," + str(self.page_size) + ";"
+        query = "SELECT id, firstName, lastName, DATE_FORMAT(birthDay,'%d/%m/%Y'), lat, lon FROM Users WHERE  date(birthDay) < '"+date_to_mysql_string(max_date)+"' AND birthDay > '"+date_to_mysql_string(min_date)+"' ORDER BY ID LIMIT "+self.get_offset(page)+"," + str(self.page_size) + ";"
         print(query)
         return self.fetch_users_from_query(query)
 
 
     def get_users_search(self, filter, page):
-        query = "SELECT id, firstName, lastName, DATE_FORMAT(birthDay,'%d/%m/%Y') FROM Users WHERE  lastName = '"+filter+"';"
+        query = "SELECT id, firstName, lastName, DATE_FORMAT(birthDay,'%d/%m/%Y'), lat, lon FROM Users WHERE  lastName = '"+filter+"' ORDER BY ID LIMIT "+self.get_offset(page)+"," + str(self.page_size) + ";"
         print(query)
         return self.fetch_users_from_query(query)
 
@@ -76,8 +77,8 @@ class Persistence:
             for i in range(len(users)):
                 users[i]['id'] = str(i)
         try:
-            query = """INSERT INTO Users (id, firstName, lastName, birthDay) 
-                                      VALUES (%s, %s, %s, STR_TO_DATE(%s,'%d/%m/%Y')) """
+            query = """INSERT INTO Users (id, firstName, lastName, birthDay, lat, lon) 
+                                      VALUES (%s, %s, %s, STR_TO_DATE(%s,'%d/%m/%Y'),%s,%s) """
             cursor = self.cnx.cursor(buffered=True)
             cursor.executemany(query, users)
             self.cnx.commit()
@@ -104,8 +105,8 @@ class Persistence:
         return users
 
     def post_user(self, user):
-        query = """INSERT INTO Users (id, firstName, lastName, birthDay) 
-                                              VALUES (%s, %s, %s, STR_TO_DATE(%s,'%d/%m/%Y')) """
+        query = """INSERT INTO Users (id, firstName, lastName, birthDay, lat, lon) 
+                                              VALUES (%s, %s, %s, STR_TO_DATE(%s,'%d/%m/%Y'), %s, %s) """
         cursor = self.cnx.cursor(buffered=True)
         new_id = self.create_id()
         user_tuple = (new_id, user['firstName'], user['lastName'], user['birthDay'])
