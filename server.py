@@ -57,7 +57,13 @@ def get_user_search():
         return "Bad Request", 400
     
     users = persistence.get_users_search(filter, page)
+
     return jsonify(users), 200
+
+
+@app.route("/user/nearest", methods=['GET'])
+def get_nearest():
+    return jsonify([])
 
 
 @app.route("/user/<uid>", methods=['GET'])
