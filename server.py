@@ -99,7 +99,7 @@ def put_users():
         ]
         for u in data
     ]
-    if persistence.put_users(data):
+    if persistence.put_users(user_list):
         return jsonify(data), 201
     else:
         return "BAD", 500
