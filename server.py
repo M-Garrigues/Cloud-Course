@@ -71,8 +71,9 @@ def get_user(uid):
     user = persistence.get_user(uid)
     if not user:
         return "BAD", 404
-    else:
-        return jsonify(user)
+    elif type(user) == list:
+        user = user[0]
+    return jsonify(user)
 
 
 @app.route('/user', methods=['PUT'])
@@ -113,7 +114,7 @@ def put_user(uid):
     except KeyError:
         user['id'] = uid
     if persistence.put_user(user):
-        return "OK", 200
+        return jsonify(user), 200
     else:
         return "BAD", 500
 
