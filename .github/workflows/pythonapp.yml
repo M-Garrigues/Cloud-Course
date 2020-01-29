@@ -1,10 +1,25 @@
 name: Python application
 
-on: [push]
+on:
+  # Trigger the workflow on push or pull request,
+  # but only for the master branch
+  push:
+    branches:
+      - dev
+      - dev-ci
+  pull_request:
+    branches:
+      - dev
+      - dev-ci
 
 jobs:
   build-app:
-    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        platform: [ubuntu-latest, windows-latest]
+      fail-fast: false
+
+    runs-on: ${{ matrix.platform }}
     steps:
     - uses: actions/checkout@v1
     - name: Set up Python 3.7
@@ -27,15 +42,39 @@ jobs:
     needs: [build-app]
     runs-on: ubuntu-18.04
     steps:
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+      - name: Create DB
+        run: mysql -uroot -proot -e "CREATE DATABASE $DB_NAME;"
+        env:
+          DB_NAME: 'python_app'
       - name: Test with pytest
+        env:
+          ENV: 'test'
+          MYSQL_ADDON_HOST: 'localhost'
+          MYSQL_ADDON_DB: 'python_app'
+          MYSQL_ADDON_PORT: 3306
+          MYSQL_ADDON_USER: 'root'
+          MYSQL_ADDON_PASSWORD: 'root'
         run: |
           pip install pytest
-          pytest
+          pytest --rootdir='$HOME/work/Cloud-Course/'
 
   client-test:
     needs: [build-app]
     runs-on: ubuntu-18.04
     steps:
+      - uses: actions/checkout@v1
+      - name: Set up Python 3.7
+        uses: actions/setup-python@v1
+        with:
+          python-version: 3.7
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
       - name: Setup Node
         uses: actions/setup-node@v1
         with:
@@ -46,9 +85,41 @@ jobs:
           repository: Slashgear/cloud-client-eval
           path: client-test
       - name: Install client tests
+        run: npm install
+        working-directory: ./client-test
+      - name: Create DB
+        run: mysql -uroot -proot -e "CREATE DATABASE $DB_NAME;"
+        env:
+          DB_NAME: 'python_app'
+      - name: Start API
+        env:
+          ENV: 'test'
+          MYSQL_ADDON_HOST: 'localhost'
+          MYSQL_ADDON_DB: 'python_app'
+          MYSQL_ADDON_PORT: 3306
+          MYSQL_ADDON_USER: 'root'
+          MYSQL_ADDON_PASSWORD: 'root'
         run: |
-          cd ./client-test
-          npm install
+          cp ./.github/client-test-config.js ./client-test/baseUrl.js
+          mkdir logs
+          ls -la
+          echo "" > logs/api.log
+          ls -la ./logs
+          python server.py > logs/api.log &
       - name: Run client tests
         if: success()
         run: npm test
+        working-directory: ./client-test
+      - name: Show logs
+        if: always()
+        run: |
+          ls -la
+          ls -la ./logs
+          cat logs/api.log
+      - name: pull-request-action
+        if: success()
+        uses: vsoch/pull-request-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH_PREFIX: ""
+          PULL_REQUEST_BRANCH: "master"
