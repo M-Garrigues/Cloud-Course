@@ -75,6 +75,13 @@ def put_users():
         data = [request.json]
     else:
         data = request.json
+
+    try:
+        _ = data[0]['id']
+    except KeyError:
+        for i in range(len(data)):
+            data[i]['id'] = str(i)
+
     user_list = [
         [
             u['id'],
