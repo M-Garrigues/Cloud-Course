@@ -78,7 +78,7 @@ class Persistence:
                 users[i]['id'] = str(i)
         try:
             query = """INSERT INTO Users (id, firstName, lastName, birthDay, lat, lon) 
-                                      VALUES (%s, %s, %s, STR_TO_DATE(%s,'%d/%m/%Y'),%s,%s) """
+                                      VALUES (%s, %s, %s, STR_TO_DATE(%s,'%m/%d/%Y'),%s,%s) """
 
             cursor = self.cnx.cursor(buffered=True)
             cursor.executemany(query, users)
@@ -107,7 +107,7 @@ class Persistence:
 
     def post_user(self, user):
         query = """INSERT INTO Users (id, firstName, lastName, birthDay, lat, lon) 
-                                              VALUES (%s, %s, %s, STR_TO_DATE(%s,'%d/%m/%Y'), %s, %s) """
+                                              VALUES (%s, %s, %s, STR_TO_DATE(%s,'%m/%d/%Y'), %s, %s) """
         cursor = self.cnx.cursor(buffered=True)
         new_id = self.create_id()
         user_tuple = (new_id, user['firstName'], user['lastName'], user['birthDay'], user['position']['lat'], user['position']['lon'])
