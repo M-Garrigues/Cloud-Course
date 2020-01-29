@@ -92,7 +92,7 @@ def put_users():
         for u in data
     ]
     if persistence.put_users(user_list):
-        return "OK", 201
+        return user_list, 201
     else:
         return "BAD", 500
 
@@ -133,7 +133,7 @@ def post_user():
         return jsonify(user)
     else:
         return "Server error", 500
-    
+
 
 if __name__ == "__main__":
     app.run()
