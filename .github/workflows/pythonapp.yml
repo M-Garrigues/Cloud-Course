@@ -60,7 +60,7 @@ jobs:
           MYSQL_ADDON_PASSWORD: 'root'
         run: |
           pip install pytest
-          pytest --rootdir='$HOME/Cloud-Course/'
+          pytest --rootdir='$HOME/work/Cloud-Course/'
 
   client-test:
     needs: [build-app]
