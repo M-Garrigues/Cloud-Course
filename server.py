@@ -22,6 +22,8 @@ def headers():
 def get_users():
     page = request.args.get('page', default=0, type=int)
     users = persistence.get_users(page)
+    if type(users) == dict:
+        users = [users]
     return jsonify(users)
 
 
@@ -81,7 +83,7 @@ def put_user(uid):
     except KeyError:
         user['id'] = uid
     if persistence.put_user(user):
-        return "OK", 201
+        return "OK", 200
     else:
         return "BAD", 500
 
@@ -103,7 +105,7 @@ def delete_user(uid):
 @app.route("/user", methods=['POST'])
 def post_user():
     persistence.post_user(request.json)
-    return "OK", 200
+    return "OK", 201
 
 
 if __name__ == "__main__":
