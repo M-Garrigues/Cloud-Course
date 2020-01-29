@@ -6,6 +6,8 @@ from dateutil.relativedelta import relativedelta
 def date_to_string(date):
     return datetime.strftime(date, '%d/%m/%Y')
 
+def date_to_mysql_string(date):
+    return datetime.strftime(date, '%Y-%m-%d')
 
 def string_to_mysql(string):
     date = datetime.strptime(string, '%d/%m/%Y')
@@ -42,14 +44,15 @@ class Persistence:
 
         date_limit = datetime.now() - relativedelta(years=age_limit)
 
-        query = "SELECT id, firstName, lastName, DATE_FORMAT(birthDay,'%d/%m/%Y')FROM Users WHERE birthDay > "+date_limit+" ORDER BY ID LIMIT "+self.get_offset(page)+"," + str(self.page_size) + ";"
+        query = "SELECT id, firstName, lastName, DATE_FORMAT(birthDay,'%d/%m/%Y')FROM Users WHERE date(birthDay) < date '"+date_to_mysql_string(date_limit)+"' ORDER BY ID LIMIT "+self.get_offset(page)+"," + str(self.page_size) + ";"
+        print(query)
         return self.fetch_users_from_query(query)
 
     def get_users_age_equal(self, age, page):
-        min_date = datetime.now() - relativedelta(years=age)
-
-        max_date = datetime.now() - relativedelta(years=age-1) - relativedelta(days=1)
-        query = "SELECT id, firstName, lastName, DATE_FORMAT(birthDay,'%d/%m/%Y')FROM Users WHERE ORDER birthDay < "+max_date+" AND birthDay > "+min_date+" ORDER BY ID LIMIT "+self.get_offset(page)+"," + str(self.page_size) + ";"
+        min_date = datetime.now() - relativedelta(years=age+1)
+        max_date = datetime.now() - relativedelta(years=age) - relativedelta(days=1)
+        query = "SELECT id, firstName, lastName, DATE_FORMAT(birthDay,'%d/%m/%Y')FROM Users WHERE  date(birthDay) < '"+date_to_mysql_string(max_date)+"' AND birthDay > '"+date_to_mysql_string(min_date)+"' ORDER BY ID LIMIT "+self.get_offset(page)+"," + str(self.page_size) + ";"
+        print(query)
         return self.fetch_users_from_query(query)
 
     def delete_users(self):
