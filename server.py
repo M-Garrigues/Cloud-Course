@@ -51,7 +51,10 @@ def get_users_age():
 @app.route("/user/<uid>", methods=['GET'])
 def get_user(uid):
     user = persistence.get_user(uid)
-    return jsonify(user)
+    if not user:
+        return "BAD", 404
+    else:
+        return jsonify(user)
 
 
 @app.route('/user', methods=['PUT'])
