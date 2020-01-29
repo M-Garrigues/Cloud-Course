@@ -126,9 +126,14 @@ def delete_user(uid):
 
 @app.route("/user", methods=['POST'])
 def post_user():
-    persistence.post_user(request.json)
-    return "OK", 201
-
+    user = request.json
+    new_id  = persistence.post_user(user)
+    if new_id:
+        user['id'] = new_id
+        return jsonify(user)
+    else:
+        return "Server error", 500
+    
 
 if __name__ == "__main__":
     app.run()
