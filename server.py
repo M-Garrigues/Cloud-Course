@@ -18,7 +18,6 @@ def headers():
     return '<h1>BONJOUR</h1>'
 
 
-
 @app.route("/user", methods=['GET'])
 def get_users():
     page = request.args.get('page', default=0, type=int)
@@ -28,12 +27,15 @@ def get_users():
 
 @app.route("/user/age", methods=['GET'])
 def get_users_age():
-    gt = request.args.get('gt', default=-1, type=int)
-    eq = request.args.get('eq', default=-1, type=int)
+    gt = request.args.get('gt', default=0, type=int)
+    eq = request.args.get('eq', default=0, type=int)
     page = request.args.get('page', default=0, type=int)
 
     if not isinstance(gt, int) and not isinstance(eq, int):
-        return []
+        return "Bad Request", 400
+
+    if gt < 0 or eq < 0:
+        return "Bad Request", 400
 
     if gt > 0:
         users = persistence.get_users_age_greater(gt, page)
@@ -41,7 +43,7 @@ def get_users_age():
         users = persistence.get_users_age_equal(eq, page)
     else:
         users = persistence.get_users(page)
-    return jsonify(users)
+    return jsonify(users), 200
 
 
 @app.route("/user/<uid>", methods=['GET'])
