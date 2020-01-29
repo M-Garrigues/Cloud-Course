@@ -60,7 +60,7 @@ jobs:
           MYSQL_ADDON_PASSWORD: 'root'
         run: |
           pip install pytest
-          pytest
+          pytest test_api.py test_persistance.py
 
   client-test:
     needs: [build-app]
