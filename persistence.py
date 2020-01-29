@@ -1,7 +1,7 @@
 import mysql
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
-from np import random as rd
+import random as rd
 
 
 def date_to_string(date):
