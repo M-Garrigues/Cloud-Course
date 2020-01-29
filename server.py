@@ -75,17 +75,26 @@ def put_users():
         data = [request.json]
     else:
         data = request.json
+
+    try:
+        _ = data[0]['id']
+    except KeyError:
+        for i in range(len(data)):
+            data[i]['id'] = str(i)
+
     user_list = [
         [
             u['id'],
             u['firstName'],
             u['lastName'],
-            u['birthDay']
+            u['birthDay'],
+            u['position']['lat'],
+            u['position']['lon']
         ]
         for u in data
     ]
-    if persistence.put_users(user_list):
-        return "OK", 201
+    if persistence.put_users(data):
+        return jsonify(data), 201
     else:
         return "BAD", 500
 
@@ -119,8 +128,13 @@ def delete_user(uid):
 
 @app.route("/user", methods=['POST'])
 def post_user():
-    persistence.post_user(request.json)
-    return "OK", 201
+    user = request.json
+    new_id  = persistence.post_user(user)
+    if new_id:
+        user['id'] = new_id
+        return jsonify(user)
+    else:
+        return "Server error", 500
 
 
 if __name__ == "__main__":
