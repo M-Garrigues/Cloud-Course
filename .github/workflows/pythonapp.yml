@@ -103,7 +103,7 @@ jobs:
           cp ./.github/client-test-config.js ./client-test/baseUrl.js
           mkdir logs
           ls -la
-          cat "" > logs/api.log
+          echo "" > logs/api.log
           ls -la ./logs
           python server.py > logs/api.log &
       - name: Run client tests
