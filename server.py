@@ -48,6 +48,18 @@ def get_users_age():
     return jsonify(users), 200
 
 
+@app.route("/user/search", methods=['GET'])
+def get_user_search():
+    filter = request.args.get('term', default="", type=str)
+    page = request.args.get('page', default=0, type=int)
+
+    if not isinstance(filter, str):
+        return "Bad Request", 400
+    
+    users = persistence.get_users_search(filter, page)
+    return jsonify(users), 200
+
+
 @app.route("/user/<uid>", methods=['GET'])
 def get_user(uid):
     user = persistence.get_user(uid)
@@ -63,6 +75,13 @@ def put_users():
         data = [request.json]
     else:
         data = request.json
+
+    try:
+        _ = data[0]['id']
+    except KeyError:
+        for i in range(len(data)):
+            data[i]['id'] = str(i)
+
     user_list = [
         [
             u['id'],
@@ -107,9 +126,14 @@ def delete_user(uid):
 
 @app.route("/user", methods=['POST'])
 def post_user():
-    persistence.post_user(request.json)
-    return "OK", 201
-
+    user = request.json
+    new_id  = persistence.post_user(user)
+    if new_id:
+        user['id'] = new_id
+        return jsonify(user)
+    else:
+        return "Server error", 500
+    
 
 if __name__ == "__main__":
     app.run()

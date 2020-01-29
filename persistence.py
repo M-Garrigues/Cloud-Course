@@ -37,12 +37,10 @@ class Persistence:
         return users
 
     def get_users(self, page):
-
         query = "SELECT id, firstName, lastName, DATE_FORMAT(birthDay,'%d/%m/%Y')FROM Users ORDER BY ID LIMIT "+self.get_offset(page)+","+str(self.page_size)+";"
         return self.fetch_users_from_query(query)
 
     def get_users_age_greater(self, age_limit, page):
-
         date_limit = datetime.now() - relativedelta(years=age_limit)
 
         query = "SELECT id, firstName, lastName, DATE_FORMAT(birthDay,'%d/%m/%Y')FROM Users WHERE date(birthDay) < date '"+date_to_mysql_string(date_limit)+"' ORDER BY ID LIMIT "+self.get_offset(page)+"," + str(self.page_size) + ";"
@@ -56,6 +54,12 @@ class Persistence:
         print(query)
         return self.fetch_users_from_query(query)
 
+
+    def get_users_search(self, filter, page):
+        query = "SELECT id, firstName, lastName, DATE_FORMAT(birthDay,'%d/%m/%Y') FROM Users WHERE  lastName = '"+filter+"';"
+        print(query)
+        return self.fetch_users_from_query(query)
+
     def delete_users(self):
         cursor = self.cnx.cursor(buffered=True)
         query = "DELETE FROM Users" # TODO : TRUNCATE MAY BE FASTER
@@ -66,11 +70,6 @@ class Persistence:
 
     def put_users(self, users):
         self.delete_users()
-        try:
-            _ = users[0]['id']
-        except KeyError:
-            for i in range(len(users)):
-                users[i]['id'] = str(i)
         try:
             query = """INSERT INTO Users (id, firstName, lastName, birthDay) 
                                       VALUES (%s, %s, %s, STR_TO_DATE(%s,'%d/%m/%Y')) """
