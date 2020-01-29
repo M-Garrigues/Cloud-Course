@@ -143,7 +143,7 @@ class Persistence:
         found = True
         while found:
             found = False
-            new_id = str(rd.randint(1000000))
+            new_id = str(rd.randint(0, 1000000))
             for (id) in cursor:
                 if id == new_id:
                     found = True
