@@ -121,8 +121,8 @@ class Persistence:
     def put_user(self, user):
         try:
             cursor = self.cnx.cursor(buffered=True)
-            query = """Update Laptop set Name = %s, Price = %s where id = %s"""
-            user_tuple = (user['id'], user['firstName'], user['lastName'], user['birthDay'])
+            query = """Update LUsers set id = %s, firstName = %s, lastName = %s, birthDay = %s, lat = %s, lon = %s where id = %s"""
+            user_tuple = (user['id'], user['firstName'], user['lastName'], user['birthDay'], user['position']['lat'], user['position']['lon'])
             cursor.execute(query, user_tuple)
             self.cnx.commit()
             return True
