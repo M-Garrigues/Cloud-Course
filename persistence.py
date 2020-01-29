@@ -51,14 +51,11 @@ class Persistence:
         min_date = datetime.now() - relativedelta(years=age+1)
         max_date = datetime.now() - relativedelta(years=age) - relativedelta(days=1)
         query = "SELECT id, firstName, lastName, DATE_FORMAT(birthDay,'%d/%m/%Y'), lat, lon FROM Users WHERE  date(birthDay) < '"+date_to_mysql_string(max_date)+"' AND birthDay > '"+date_to_mysql_string(min_date)+"' ORDER BY ID LIMIT "+self.get_offset(page)+"," + str(self.page_size) + ";"
-        print(query)
         return self.fetch_users_from_query(query)
 
 
     def get_users_search(self, filter, page):
         query = "SELECT id, firstName, lastName, DATE_FORMAT(birthDay,'%d/%m/%Y'), lat, lon FROM Users WHERE  lastName = '"+filter+"' ORDER BY ID LIMIT "+self.get_offset(page)+"," + str(self.page_size) + ";"
-
-        print(query)
         return self.fetch_users_from_query(query)
 
     def delete_users(self):
