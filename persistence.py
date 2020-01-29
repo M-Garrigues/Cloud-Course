@@ -93,7 +93,7 @@ class Persistence:
             u = {"id": id,
                  "firstName": firstName,
                  "lastName": lastName,
-                 "birthDay": birthday,
+                 "birthDay": date_to_string(birthday),
                  "position": {"lat": float(lat), "lon": float(lon)}}
             users.append(u)
         return users
