@@ -108,7 +108,10 @@ jobs:
         run: npm test
       - name: Show logs
         if: always()
-        run: cat logs/api.log
+        run: |
+          ls -la
+          ls -la ./logs
+          cat logs/api.log
         working-directory: ./client-test
       - name: pull-request-action
         if: success()
