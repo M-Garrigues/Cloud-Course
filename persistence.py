@@ -1,6 +1,7 @@
 import mysql
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from np import random as rd
 
 
 def date_to_string(date):
@@ -102,11 +103,12 @@ class Persistence:
         query = """INSERT INTO Users (id, firstName, lastName, birthDay) 
                                               VALUES (%s, %s, %s, STR_TO_DATE(%s,'%d/%m/%Y')) """
         cursor = self.cnx.cursor(buffered=True)
-        user_tuple = (user['id'], user['firstName'], user['lastName'], user['birthDay'])
+        new_id = self.create_id()
+        user_tuple = (new_id, user['firstName'], user['lastName'], user['birthDay'])
         cursor.execute(query, user_tuple)
         self.cnx.commit()
         if cursor.rowcount == 1:
-            return True
+            return new_id
         else:
             return False
 
@@ -133,3 +135,16 @@ class Persistence:
         cursor.execute(query, (id,))
         self.cnx.commit()
         return True
+
+    def create_id(self):
+        query = """SELECT id FROM Users"""
+        cursor = self.cnx.cursor(buffered=True)
+        cursor.execute(query)
+        found = True
+        while found:
+            found = False
+            new_id = str(rd.randint(1000000))
+            for (id) in cursor:
+                if id == new_id:
+                    found = True
+        return new_id
