@@ -33,7 +33,7 @@ class Persistence:
                  "firstName": firstName,
                  "lastName": lastName,
                  "birthDay": birthday,
-                 "position": {"lat": lat, "lon": lon}}
+                 "position": {"lat": float(lat), "lon": float(lon)}}
             users.append(u)
         return users
 
