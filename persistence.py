@@ -69,11 +69,6 @@ class Persistence:
     def put_users(self, users):
         self.delete_users()
         try:
-            _ = users[0]['id']
-        except KeyError:
-            for i in range(len(users)):
-                users[i]['id'] = str(i)
-        try:
             query = """INSERT INTO Users (id, firstName, lastName, birthDay, lat, lon) 
                                       VALUES (%s, %s, %s, STR_TO_DATE(%s,'%m/%d/%Y'),%s,%s) """
 
@@ -119,7 +114,7 @@ class Persistence:
     def put_user(self, user):
         try:
             cursor = self.cnx.cursor(buffered=True)
-            query = """Update LUsers set id = %s, firstName = %s, lastName = %s, birthDay = %s, lat = %s, lon = %s where id = %s"""
+            query = """Update Users set id = %s, firstName = %s, lastName = %s, birthDay = %s, lat = %s, lon = %s where id = %s"""
             user_tuple = (user['id'], user['firstName'], user['lastName'], user['birthDay'], user['position']['lat'], user['position']['lon'])
             cursor.execute(query, user_tuple)
             self.cnx.commit()
