@@ -5,13 +5,13 @@ import random as rd
 
 
 def date_to_string(date):
-    return datetime.strftime(date, '%d/%m/%Y')
+    return datetime.strftime(date, '%m/%d/%Y')
 
 def date_to_mysql_string(date):
     return datetime.strftime(date, '%Y-%m-%d')
 
 def string_to_mysql(string):
-    date = datetime.strptime(string, '%d/%m/%Y')
+    date = datetime.strptime(string, '%m/%d/%Y')
     return datetime.strftime(date, '%Y-%m-%d %H:%M:%S')
 
 
@@ -37,26 +37,26 @@ class Persistence:
         return users
 
     def get_users(self, page):
-        query = "SELECT id, firstName, lastName, DATE_FORMAT(birthDay,'%d/%m/%Y')FROM Users ORDER BY ID LIMIT "+self.get_offset(page)+","+str(self.page_size)+";"
+        query = "SELECT id, firstName, lastName, DATE_FORMAT(birthDay,'%m/%d/%Y')FROM Users ORDER BY ID LIMIT "+self.get_offset(page)+","+str(self.page_size)+";"
         return self.fetch_users_from_query(query)
 
     def get_users_age_greater(self, age_limit, page):
         date_limit = datetime.now() - relativedelta(years=age_limit)
 
-        query = "SELECT id, firstName, lastName, DATE_FORMAT(birthDay,'%d/%m/%Y')FROM Users WHERE date(birthDay) < date '"+date_to_mysql_string(date_limit)+"' ORDER BY ID LIMIT "+self.get_offset(page)+"," + str(self.page_size) + ";"
+        query = "SELECT id, firstName, lastName, DATE_FORMAT(birthDay,'%m/%d/%Y')FROM Users WHERE date(birthDay) < date '"+date_to_mysql_string(date_limit)+"' ORDER BY ID LIMIT "+self.get_offset(page)+"," + str(self.page_size) + ";"
         print(query)
         return self.fetch_users_from_query(query)
 
     def get_users_age_equal(self, age, page):
         min_date = datetime.now() - relativedelta(years=age+1)
         max_date = datetime.now() - relativedelta(years=age) - relativedelta(days=1)
-        query = "SELECT id, firstName, lastName, DATE_FORMAT(birthDay,'%d/%m/%Y')FROM Users WHERE  date(birthDay) < '"+date_to_mysql_string(max_date)+"' AND birthDay > '"+date_to_mysql_string(min_date)+"' ORDER BY ID LIMIT "+self.get_offset(page)+"," + str(self.page_size) + ";"
+        query = "SELECT id, firstName, lastName, DATE_FORMAT(birthDay,'%m/%d/%Y')FROM Users WHERE  date(birthDay) < '"+date_to_mysql_string(max_date)+"' AND birthDay > '"+date_to_mysql_string(min_date)+"' ORDER BY ID LIMIT "+self.get_offset(page)+"," + str(self.page_size) + ";"
         print(query)
         return self.fetch_users_from_query(query)
 
 
     def get_users_search(self, filter, page):
-        query = "SELECT id, firstName, lastName, DATE_FORMAT(birthDay,'%d/%m/%Y') FROM Users WHERE  lastName = '"+filter+"';"
+        query = "SELECT id, firstName, lastName, DATE_FORMAT(birthDay,'%m/%d/%Y') FROM Users WHERE  lastName = '"+filter+"';"
         print(query)
         return self.fetch_users_from_query(query)
 
@@ -72,7 +72,7 @@ class Persistence:
         self.delete_users()
         try:
             query = """INSERT INTO Users (id, firstName, lastName, birthDay) 
-                                      VALUES (%s, %s, %s, STR_TO_DATE(%s,'%d/%m/%Y')) """
+                                      VALUES (%s, %s, %s, STR_TO_DATE(%s,'%m/%d/%Y')) """
             cursor = self.cnx.cursor(buffered=True)
             cursor.executemany(query, users)
             self.cnx.commit()
@@ -100,7 +100,7 @@ class Persistence:
 
     def post_user(self, user):
         query = """INSERT INTO Users (id, firstName, lastName, birthDay) 
-                                              VALUES (%s, %s, %s, STR_TO_DATE(%s,'%d/%m/%Y')) """
+                                              VALUES (%s, %s, %s, STR_TO_DATE(%s,'%m/%d/%Y')) """
         cursor = self.cnx.cursor(buffered=True)
         new_id = self.create_id()
         user_tuple = (new_id, user['firstName'], user['lastName'], user['birthDay'])
